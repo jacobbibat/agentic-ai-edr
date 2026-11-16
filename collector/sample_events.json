@@ -1,0 +1,20 @@
+[
+  {
+    "EventID": 1,
+    "UtcTime": "2026-11-16 14:30:00.000",
+    "Computer": "WIN11-ENDPOINT",
+    "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "CommandLine": "powershell.exe -NoProfile",
+    "ParentImage": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+    "User": "LAB\\TestUser"
+  },
+  {
+    "EventID": 1,
+    "UtcTime": "2026-11-16 14:32:00.000",
+    "Computer": "WIN11-ENDPOINT",
+    "Image": "C:\\Windows\\System32\\notepad.exe",
+    "CommandLine": "notepad.exe",
+    "ParentImage": "C:\\Windows\\explorer.exe",
+    "User": "LAB\\TestUser"
+  }
+]
