@@ -1,10 +1,9 @@
-from detection.rules import (
-    is_word_powershell,
-    is_encoded_powershell,
-)
 from detection.engine import DetectionEngine
 from detection.registry import DETECTION_RULES
-
+from detection.rules import (
+    is_encoded_powershell,
+    is_word_powershell,
+)
 
 # ------------------------------------------
 # Helper function to create sample events

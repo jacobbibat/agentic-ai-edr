@@ -1,5 +1,4 @@
 from pathlib import PureWindowsPath
-from detection.alert_builder import AlertBuilder
 
 
 def is_powershell_process(process_name: str) -> bool:
