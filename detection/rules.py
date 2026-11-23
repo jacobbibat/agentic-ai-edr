@@ -26,18 +26,62 @@ def is_word_powershell(event: dict) -> bool:
         and child_name in {"powershell.exe", "pwshe.exe"}
     )
 
+def is_encoded_powershell(event: dict) -> bool:
+    """Detect PowerShell using an encoded command."""
+
+    #Only examine Sysmon process creation events
+    if event.get("EventID") !=1:
+        return False
+
+    #Retrieve the process path and its command line
+    process_path = event.get("Image", "")
+    command_line = event.get("Command", "")
+
+    #Extract the executable name and lower it
+    process_name = PureWindowsPath(process_name).name.lower()
+
+    #Check if it is powershell process
+    if process_name not in {"powershell.exe", "pwsh.exe"}:
+        return False
+
+    #Split the command line into individual arguements
+    arguments = command_line.lower().split()
+
+    #Detect supported encoded-command parameter forms
+        # Detect supported encoded-command parameter forms.
+    encoded_parameters = {
+        "-encodedcommand",
+        "-enc",
+        "-e",
+    }
+
+    return any(
+        argument in encoded_parameters
+        for argument in arguments
+    )
+
 # -------------------------------------------------------------- #
 
 def generate_alert(event:dict) -> dict | None:
     """Generate an alert when a detection rule matches"""
 
-    if not is_word_powershell:
+    if is_word_powershell(event):
+        rule_id = "EDR-001"
+        rule_name = "Microsoft Word spawning Powershell"
+        severity = "High"
+
+    elif is_encoded_powershell(event):
+        rule_id = "EDR-002"
+        rule_name = "Encoded PowerShell execution"
+        severity = "Medium"
+
+    else:
         return None
 
     return {
-        "rule_id": "EDR-001",
-        "rule_name": "Microsoft Word creates Powershell",
-        "severity": "High",
+        "rule_id": rule_id,
+        "rule_name": rule_name,
+        "severity": severity,
         "status": "New",
         "timestamp": event.get("UtcTime"),
         "endpoint": event.get("Computer"),
@@ -47,3 +91,4 @@ def generate_alert(event:dict) -> dict | None:
             "command_line": event.get("CommandLine"),
         },
     }
+
