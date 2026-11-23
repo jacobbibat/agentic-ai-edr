@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+
 def load_events():
     file_path = Path(__file__).with_name("sample_events.json")
 
@@ -8,6 +9,7 @@ def load_events():
         events = json.load(file)
 
     return events
+
 
 if __name__ == "__main__":
     events = load_events()
@@ -17,4 +19,3 @@ if __name__ == "__main__":
         print(f"Process: {event['Image']}")
         print(f"Parent: {event['ParentImage']}")
         print("-----------------------------")
-        
