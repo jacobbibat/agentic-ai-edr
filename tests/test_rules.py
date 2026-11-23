@@ -1,19 +1,14 @@
-from detection.rules import *
+from detection.rules import (
+    is_word_powershell,
+    is_encoded_powershell,
+)
+from detection.engine import DetectionEngine
+from detection.registry import DETECTION_RULES
 
 
-def test_detects_windows_powershell():
-    assert is_powershell_process("powershell.exe")
-
-
-def test_detects_windows_powershell_insensitive():
-    assert is_powershell_process("PowerShell.EXE")
-
-
-def test_ignore_unrelated_process():
-    assert not is_powershell_process("notepad.exe")
-
-
-# ------------------------------------------#
+# ------------------------------------------
+# Helper function to create sample events
+# ------------------------------------------
 
 
 def make_event(parent: str, child: str) -> dict:
@@ -22,8 +17,13 @@ def make_event(parent: str, child: str) -> dict:
         "ParentImage": parent,
         "Image": child,
         "Computer": "Jacobs-PC",
-        "UtcTime": "2026-11-16 14:30:00:000",
+        "UtcTime": "2026-11-16 14:30:00.000",
     }
+
+
+# ------------------------------------------
+# Testing Rule 1: Word launching PowerShell
+# ------------------------------------------
 
 
 def test_word_launching_powershell():
@@ -31,6 +31,7 @@ def test_word_launching_powershell():
         r"C:\Program Files\Microsoft Office\WINWORD.EXE",
         r"C:\Windows\System32\powershell.exe",
     )
+
     assert is_word_powershell(event) is True
 
 
@@ -52,34 +53,20 @@ def test_word_launching_notepad():
     assert is_word_powershell(event) is False
 
 
-def test_alert_generation():
-    event = make_event(
-        r"C:\Program Files\Microsoft Office\WINWORD.EXE",
-        r"C:\Windows\System32\powershell.exe",
-    )
-
-    alert = generate_alert(event)
-
-    assert alert is not None
-    assert alert["rule_id"] == "EDR-001"
-    assert alert["severity"] == "High"
-
-
 def test_ignores_other_event_ids():
     event = make_event(
         r"C:\Program Files\Microsoft Office\WINWORD.EXE",
         r"C:\Windows\System32\powershell.exe",
     )
+
     event["EventID"] = 3
 
     assert is_word_powershell(event) is False
 
 
-# -----------------------------------------#
-
-# Testing Rule 2, encoded powershell
-
-from detection.rules import is_encoded_powershell
+# ------------------------------------------
+# Testing Rule 2: Encoded PowerShell
+# ------------------------------------------
 
 
 def test_encoded_powershell():
@@ -110,3 +97,43 @@ def test_unrelated_process_with_encoded_argument():
     }
 
     assert is_encoded_powershell(event) is False
+
+
+# ------------------------------------------
+# Testing the Detection Engine
+# ------------------------------------------
+
+
+def test_alert_generation():
+    event = make_event(
+        r"C:\Program Files\Microsoft Office\WINWORD.EXE",
+        r"C:\Windows\System32\powershell.exe",
+    )
+
+    engine = DetectionEngine(DETECTION_RULES)
+
+    alerts = engine.analyse(event)
+
+    assert len(alerts) == 1
+    assert alerts[0]["rule_id"] == "EDR-001"
+    assert alerts[0]["severity"] == "High"
+
+
+def test_multiple_alert_generation():
+    # This event should match BOTH EDR-001 and EDR-002.
+    event = make_event(
+        r"C:\Program Files\Microsoft Office\WINWORD.EXE",
+        r"C:\Windows\System32\powershell.exe",
+    )
+
+    event["CommandLine"] = "powershell.exe -EncodedCommand VABlAHMAdAA="
+
+    engine = DetectionEngine(DETECTION_RULES)
+
+    alerts = engine.analyse(event)
+
+    assert len(alerts) == 2
+
+    rule_ids = {alert["rule_id"] for alert in alerts}
+
+    assert rule_ids == {"EDR-001", "EDR-002"}

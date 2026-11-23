@@ -61,32 +61,3 @@ def is_encoded_powershell(event: dict) -> bool:
 
 
 # -------------------------------------------------------------- #
-
-
-def generate_alerts(event: dict) -> dict | None:
-    """Generate an alert when a detection rule matches"""
-
-    alerts = []
-
-    # Create builder once for this event
-    builder = AlertBuilder(event)
-
-    if is_word_powershell(event):
-        alerts.append(
-            builder.build(
-                rule_id="EDR-001",
-                rule_name="Microsoft Word spawning PowerShell",
-                severity="High",
-            )
-        )
-
-    elif is_encoded_powershell(event):
-        alerts.append(
-            builder.build(
-                rule_id="EDR-002",
-                rule_name="Encoded PowerShell execution",
-                severity="Medium",
-            )
-        )
-
-    return alerts
