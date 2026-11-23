@@ -64,3 +64,38 @@ def test_ignores_other_event_ids():
 
     assert is_word_powershell(event) is False
 
+# -----------------------------------------#
+
+#Testing Rule 2, encoded powershell
+
+from detection.rules import is_encoded_powershell
+
+
+def test_encoded_powershell():
+    event = {
+        "EventID": 1,
+        "Image": r"C:\Windows\System32\powershell.exe",
+        "CommandLine": "powershell.exe -EncodedCommand VABlAHMAdAA=",
+    }
+
+    assert is_encoded_powershell(event) is True
+
+
+def test_powershell_without_encoding():
+    event = {
+        "EventID": 1,
+        "Image": r"C:\Windows\System32\powershell.exe",
+        "CommandLine": "powershell.exe -NoProfile",
+    }
+
+    assert is_encoded_powershell(event) is False
+
+
+def test_unrelated_process_with_encoded_argument():
+    event = {
+        "EventID": 1,
+        "Image": r"C:\Windows\System32\notepad.exe",
+        "CommandLine": "notepad.exe -enc ABC123",
+    }
+
+    assert is_encoded_powershell(event) is False
