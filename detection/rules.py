@@ -35,10 +35,10 @@ def is_encoded_powershell(event: dict) -> bool:
 
     #Retrieve the process path and its command line
     process_path = event.get("Image", "")
-    command_line = event.get("Command", "")
+    command_line = event.get("CommandLine", "")
 
     #Extract the executable name and lower it
-    process_name = PureWindowsPath(process_name).name.lower()
+    process_name = PureWindowsPath(process_path).name.lower()
 
     #Check if it is powershell process
     if process_name not in {"powershell.exe", "pwsh.exe"}:
