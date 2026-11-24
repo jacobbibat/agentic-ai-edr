@@ -24,9 +24,7 @@ def test_saves_event_with_two_alerts(test_repository):
         "EventID": 1,
         "UtcTime": "2026-11-24 10:00:00.000",
         "Computer": "WIN11-ENDPOINT",
-        "ParentImage": (
-            r"C:\Program Files\Microsoft Office\WINWORD.EXE"
-        ),
+        "ParentImage": (r"C:\Program Files\Microsoft Office\WINWORD.EXE"),
         "Image": r"C:\Windows\System32\powershell.exe",
         "CommandLine": "powershell.exe -enc ABC123",
     }
@@ -124,9 +122,7 @@ def test_retrieve_event_and_alerts(test_repository):
     alerts = engine.analyse(event)
 
     # Save event and matching alerts.
-    event_id = test_repository.save_event_with_alerts(
-        event, alerts
-    )
+    event_id = test_repository.save_event_with_alerts(event, alerts)
 
     # Retrieve alerts.
     saved_alerts = test_repository.get_all_alerts()

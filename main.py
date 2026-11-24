@@ -1,4 +1,3 @@
-
 from collector.read_events import load_events
 from database.connection import initialise_database
 from database.repository import SecurityRepository
@@ -29,10 +28,7 @@ def main():
             alerts,
         )
 
-        print(
-            f"Stored event {event_id} "
-            f"with {len(alerts)} alerts."
-        )
+        print(f"Stored event {event_id} with {len(alerts)} alerts.")
 
 
 if __name__ == "__main__":

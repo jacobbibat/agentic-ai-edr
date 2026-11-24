@@ -4,22 +4,22 @@ from pathlib import Path
 
 from database.connection import DATABASE_PATH, get_connection
 
+
 class SecurityRepository:
     """Store and retrieve security events and alerts."""
 
     def __init__(self, database_path: str | Path = DATABASE_PATH):
         self.database_path = database_path
 
-    def save_event_with_alerts (
-            self,
-            event: dict,
-            alerts: list[dict],
+    def save_event_with_alerts(
+        self,
+        event: dict,
+        alerts: list[dict],
     ) -> int:
         """Save one event and all its alerts atomically"""
 
         # Opening the db connection, closing() ensures connection is closed when we're finished, even if we have an error
         with closing(get_connection(self.database_path)) as connection:
-
             # Start a transaction explicitly
             connection.execute("BEGIN")
 
@@ -39,14 +39,16 @@ class SecurityRepository:
                         event["EventID"],
                         event["UtcTime"],
                         event["Computer"],
-                        json.dumps(event), # event_data stores text, convert dictionary into JSON so SQLite can store
+                        json.dumps(
+                            event
+                        ),  # event_data stores text, convert dictionary into JSON so SQLite can store
                     ),
                 )
 
                 # Retrieve the new event's database ID.
-                event_id = cursor.lastrowid #Gives a private key generated for that inserted row, i.e SQLite id = 7, we use event_id = 7 when inserting its alerts
+                event_id = cursor.lastrowid  # Gives a private key generated for that inserted row, i.e SQLite id = 7, we use event_id = 7 when inserting its alerts
 
-                #Save every generated alert
+                # Save every generated alert
                 for alert in alerts:
                     connection.execute(
                         """
@@ -74,13 +76,12 @@ class SecurityRepository:
                 connection.commit()
 
             except Exception:
-                #Undo pending changes if anything fails
+                # Undo pending changes if anything fails
                 connection.rollback()
                 raise
 
         return event_id
 
-    
     def get_all_alerts(self) -> list[dict]:
         """Retrieve all alerts with their endpoint information."""
 
@@ -102,9 +103,19 @@ class SecurityRepository:
                     ON a.event_id = e.id
                 ORDER BY a.id DESC
                 """
-            ).fetchall()
+            ).fetchall()  # Retrieves all rows from returned query
 
-            return [dict(row) for row in rows]
+            alerts = []
+
+            for row in rows:
+                alert = dict(row)
+
+                # Convert the evidence JSON string into a dictionary.
+                alert["evidence"] = json.loads(alert["evidence"])
+
+                alerts.append(alert)
+
+            return alerts
 
     def get_event_by_id(self, event_id: int) -> dict | None:
         """Retrieve a single event using its database ID."""
@@ -117,12 +128,14 @@ class SecurityRepository:
                 WHERE id = ?
                 """,
                 (event_id,),
-            ).fetchone()
+            ).fetchone()  # Retrieves one row or None if no row exists
 
             if row is None:
                 return None
 
-            event = dict(row)
-            event["event_data"] = json.loads(event["event_data"])
+            event = dict(row)  # converts SQLite row into Python dictionary
+            event["event_data"] = json.loads(
+                event["event_data"]
+            )  # cconverts JSON text back into Python dictionary
 
             return event

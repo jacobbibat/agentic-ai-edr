@@ -1,23 +1,34 @@
 from flask import Flask, jsonify
 
-from database.connection import initialise_database
+from database.connection import (
+    DATABASE_PATH,
+    initialise_database,
+)
 from database.repository import SecurityRepository
 
-app = Flask(__name__)
 
-# Initialise databasse
-initialise_database()
+def create_app(database_path=DATABASE_PATH):
+    """Create and configure the Flask application."""
 
-# Create our repository
-repository = SecurityRepository()
+    app = Flask(__name__)
 
-@app.get("/api/alerts")
-def get_alerts():
-    """Return all stored security alerts."""
+    # Initialise the specified database.
+    initialise_database(database_path)
 
-    alerts = repository.get_all_alerts()
+    # Create repository for this application.
+    repository = SecurityRepository(database_path)
 
-    return jsonify(alerts)
+    @app.get("/api/alerts")
+    def get_alerts():
+        """Return all security alerts as JSON."""
+
+        alerts = repository.get_all_alerts()
+
+        return jsonify(alerts)
+
+    return app
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app = create_app()
+    app.run(host="127.0.0.1", debug=True)
