@@ -48,6 +48,10 @@ class SecurityRepository:
                 # Retrieve the new event's database ID.
                 event_id = cursor.lastrowid  # Gives a private key generated for that inserted row, i.e SQLite id = 7, we use event_id = 7 when inserting its alerts
 
+                # Ensure SQLite returned a valid event ID
+                if event_id is None:
+                    raise RuntimeError("Failed to retrieve the inserted event ID.")
+
                 # Save every generated alert
                 for alert in alerts:
                     connection.execute(
@@ -139,3 +143,42 @@ class SecurityRepository:
             )  # cconverts JSON text back into Python dictionary
 
             return event
+
+    def get_dashboard_stats(self) -> dict:
+        """Return statistics for security dashboard"""
+
+        with closing(get_connection(self.database_path)) as connection:
+            # Count all stored security events
+            total_events = connection.execute(
+                "SELECT COUNT(*) FROM security_events"
+            ).fetchone()[0]
+
+            # Count all generated alerts
+            total_alerts = connection.execute(
+                "SELECT COUNT(*) FROM security_alerts"
+            ).fetchone()[0]
+
+            # Count all alerts by severity
+            severity_rows = connection.execute(
+                """
+                SELECT severity, COUNT(*) AS total
+                FROM security_alerts
+                GROUP BY severity
+                """
+            ).fetchall()
+
+        severity_counts = {
+            "High": 0,
+            "Medium": 0,
+            "Low": 0,
+        }
+        for row in severity_rows:
+            severity_counts[row["severity"]] = row["total"]
+
+        return {
+            "total_events": total_events,
+            "total_alerts": total_alerts,
+            "high_severity": severity_counts["High"],
+            "medium_severity": severity_counts["Medium"],
+            "low_severity": severity_counts["Low"],
+        }

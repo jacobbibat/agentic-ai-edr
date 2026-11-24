@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width", initial-scale="1.0">
+
+    <title>
+        {% block title %}Agentic AI EDR{% endblock %}
+    </title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bulma.min.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css')}}">
+
+</head>
+
+<body>
+    <nav class="navbar is-dark">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <strong>Agentic AI EDR</strong>
+            </a>
+        </div>
+    </nav>
+
+    <main class="section">
+        <div class="container is-fluid">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+</body>
+</html>
+

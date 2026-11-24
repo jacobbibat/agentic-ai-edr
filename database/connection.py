@@ -11,7 +11,9 @@ DATABASE_PATH = DATABASE_DIR / "edr.db"
 SCHEMA_PATH = DATABASE_DIR / "schema.sql"
 
 
-def get_connection(database_path=DATABASE_PATH):
+def get_connection(
+    database_path: str | Path = DATABASE_PATH,
+) -> sqlite3.Connection:
     """Open a SQLite connection with foreign keys enabled."""
 
     # Connect to the database file
@@ -26,7 +28,9 @@ def get_connection(database_path=DATABASE_PATH):
     return connection
 
 
-def initialise_database(database_path=DATABASE_PATH):
+def initialise_database(
+    database_path: str | Path = DATABASE_PATH,
+) -> None:
     """Create the database tables uising schema.sql"""
 
     # Read the SQL schema from our file

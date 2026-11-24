@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 from database.connection import (
     DATABASE_PATH,
@@ -25,6 +25,20 @@ def create_app(database_path=DATABASE_PATH):
         alerts = repository.get_all_alerts()
 
         return jsonify(alerts)
+
+    # New dashboard route.
+    @app.get("/")
+    def dashboard():
+        return render_template("dashboard.html")
+
+    # Dashboard Stats API
+    @app.get("/api/dashboard/stats")
+    def dashboard_stats():
+        """Return event and alert statistics."""
+
+        stats = repository.get_dashboard_stats()
+
+        return jsonify(stats)
 
     return app
 

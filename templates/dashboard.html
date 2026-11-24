@@ -1,0 +1,69 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+Security Dashboard | Agentic AI EDR
+{% endblock %}
+
+{% block content %}
+
+<h1 class="title">Security Dashboard</h1>
+
+<p class="subtitle">
+    Endpoint monitoring and security overview
+</p>
+
+
+<div class="columns">
+
+    <div class="column">
+        <div class="box">
+            <p class="heading">Total Events</p>
+            <p class="title" id="total-events">0</p>
+        </div>
+    </div>
+
+    <div class="column">
+        <div class="box">
+            <p class="heading">Security Alerts</p>
+            <p class="title" id="total-alerts">0</p>
+        </div>
+    </div>
+
+    <div class="column">
+        <div class="box">
+            <p class="heading">High Severity</p>
+            <p class="title has-text-danger"
+               id="high-severity">0</p>
+        </div>
+    </div>
+
+</div>
+
+<div class="box">
+    <h2 class="title is-5">Recent Security Alerts</h2>
+
+    <div class="table-container">
+        <table class="table is-fullwidth is-striped">
+            <thead>
+                <tr>
+                    <th>Rule ID</th>
+                    <th>Rule Name</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+                <tbody id="alerts-table-body">
+                    <tr>
+                        <td colspan="4">Loading security alerts...</td>
+                    </tr>
+                </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"
+        defer></script>
+
+{% endblock %}

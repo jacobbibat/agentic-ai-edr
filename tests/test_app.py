@@ -66,3 +66,25 @@ def test_get_alerts_with_data(client, tmp_path):
     assert response.json[0]["rule_id"] == "EDR-001"
     assert response.json[0]["severity"] == "High"
     assert isinstance(response.json[0]["evidence"], dict)
+
+
+def test_dashboard_page(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert b"Agentic AI EDR" in response.data
+    assert b"Security Dashboard" in response.data
+
+
+def test_dashboard_stats_empty(client):
+    response = client.get("/api/dashboard/stats")
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data["total_events"] == 0
+    assert data["total_alerts"] == 0
+    assert data["high_severity"] == 0
+    assert data["medium_severity"] == 0
+    assert data["low_severity"] == 0
