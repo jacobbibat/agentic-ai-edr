@@ -40,6 +40,15 @@ def create_app(database_path=DATABASE_PATH):
 
         return jsonify(stats)
 
+    @app.get("/api/events")
+    def get_events():
+        """Return stored endpoint security events."""
+
+        events = repository.get_all_events()
+
+        return jsonify(events)
+
+
     return app
 
 

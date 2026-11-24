@@ -142,7 +142,35 @@ class SecurityRepository:
                 event["event_data"]
             )  # cconverts JSON text back into Python dictionary
 
-            return event
+    def get_all_events(self) -> list[dict]:
+        """Retrieve all stored endpoint events."""
+
+        with closing(get_connection(self.database_path)) as connection:
+            rows = connection.execute(
+                """
+                SELECT
+                    id,
+                    sysmon_event_id,
+                    timestamp,
+                    endpoint,
+                    event_data
+                FROM security_events
+                ORDER BY id DESC
+                """
+            ).fetchall()
+
+        events = []
+
+        for row in rows:
+            event = dict(row)
+
+            # Convert stored JSON text back into a Python dictionary.
+            event["event_data"] = json.loads(event["event_data"])
+
+            events.append(event)
+
+        return events
+
 
     def get_dashboard_stats(self) -> dict:
         """Return statistics for security dashboard"""

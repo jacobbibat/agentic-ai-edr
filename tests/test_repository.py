@@ -139,3 +139,32 @@ def test_retrieve_event_and_alerts(test_repository):
     assert saved_event is not None
     assert saved_event["event_data"]["EventID"] == 1
     assert saved_event["endpoint"] == "WIN11-ENDPOINT"
+
+def test_get_all_events(tmp_path):
+    #Create isolated test environment
+    database_path = tmp_path / "test_edr.db"
+
+    initialise_database(database_path)
+    repository = SecurityRepository(database_path)
+
+    # Sample Sysmon event
+    event = {
+        "EventID": 1,
+        "UtcTime": "2026-11-24 18:00:00",
+        "Computer": "WIN-01",
+        "Image": r"C:\Windows\System32\notepad.exe",
+        "ParentImage": r"C:\Windows\explorer.exe",
+        "CommandLine": "notepad.exe",
+    }
+
+    # Save an event with no alerts 
+    repository.save_event_with_alerts(event, [])
+
+    # Retrieve events
+    events = repository.get_all_events()
+
+    # Verify the result
+    assert len(events) == 1
+    assert events[0]["sysmon_event_id"] == 1
+    assert events[0]["endpoint"] == "WIN-01"
+    assert events[0]["event_data"]["Image"] == event["Image"]

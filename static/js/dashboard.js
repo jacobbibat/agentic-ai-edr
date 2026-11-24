@@ -2,12 +2,14 @@ async function loadDashboard() {
     try {
         // Step 1: Retrieve dashboard statistics.
         const statsResponse = await fetch("/api/dashboard/stats");
+        console.log("Loading dashboard statistics...");
 
         if (!statsResponse.ok) {
             throw new Error("Failed to load dashboard statistics");
         }
 
         const stats = await statsResponse.json();
+        console.log("Statistics received:", stats);
 
         // Step 2: Update the summary cards.
         document.getElementById("total-events").textContent =
