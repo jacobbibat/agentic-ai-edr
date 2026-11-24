@@ -17,7 +17,7 @@ class SecurityRepository:
     ) -> int:
         """Save one event and all its alerts atomically"""
 
-        # Opening the db connection
+        # Opening the db connection, closing() ensures connection is closed when we're finished, even if we have an error
         with closing(get_connection(self.database_path)) as connection:
 
             # Start a transaction explicitly
@@ -39,12 +39,12 @@ class SecurityRepository:
                         event["EventID"],
                         event["UtcTime"],
                         event["Computer"],
-                        json.dumps(event),
+                        json.dumps(event), # event_data stores text, convert dictionary into JSON so SQLite can store
                     ),
                 )
 
                 # Retrieve the new event's database ID.
-                event_id = cursor.lastrowid
+                event_id = cursor.lastrowid #Gives a private key generated for that inserted row, i.e SQLite id = 7, we use event_id = 7 when inserting its alerts
 
                 #Save every generated alert
                 for alert in alerts:
@@ -71,7 +71,7 @@ class SecurityRepository:
                     )
 
                     # Make all changes permanent
-                    connection.commit()
+                connection.commit()
 
             except Exception:
                 #Undo pending changes if anything fails
@@ -79,3 +79,50 @@ class SecurityRepository:
                 raise
 
         return event_id
+
+    
+    def get_all_alerts(self) -> list[dict]:
+        """Retrieve all alerts with their endpoint information."""
+
+        with closing(get_connection(self.database_path)) as connection:
+            rows = connection.execute(
+                """
+                SELECT
+                    a.id,
+                    a.event_id,
+                    a.rule_id,
+                    a.rule_name,
+                    a.severity,
+                    a.status,
+                    a.evidence,
+                    e.endpoint,
+                    e.timestamp
+                FROM security_alerts AS a
+                JOIN security_events AS e
+                    ON a.event_id = e.id
+                ORDER BY a.id DESC
+                """
+            ).fetchall()
+
+            return [dict(row) for row in rows]
+
+    def get_event_by_id(self, event_id: int) -> dict | None:
+        """Retrieve a single event using its database ID."""
+
+        with closing(get_connection(self.database_path)) as connection:
+            row = connection.execute(
+                """
+                SELECT *
+                FROM security_events
+                WHERE id = ?
+                """,
+                (event_id,),
+            ).fetchone()
+
+            if row is None:
+                return None
+
+            event = dict(row)
+            event["event_data"] = json.loads(event["event_data"])
+
+            return event
