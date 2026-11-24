@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS security_events (
     endpoint TEXT NOT NULL,
     event_data TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-)
+);
 
 
 CREATE TABLE IF NOT EXISTS security_alerts (

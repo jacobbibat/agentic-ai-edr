@@ -1,6 +1,7 @@
 from collector.read_events import load_events
 from detection.engine import DetectionEngine
 from detection.registry import DETECTION_RULES
+from database.connection import initialise_database
 
 
 def main():
@@ -18,7 +19,7 @@ def main():
         alerts = engine.analyse(event)
 
         if not alerts:
-            print("No detection rules matched.")
+            print("No detection rules matched.\n")
             continue
 
         # Display every generated alert.
@@ -26,8 +27,10 @@ def main():
             print("\nSECURITY ALERT DETECTED")
             print(f"Rule: {alert['rule_name']}")
             print(f"Severity: {alert['severity']}")
-            print(f"Endpoint: {alert['endpoint']}")
+            print(f"Endpoint: {alert['endpoint']}\n")
 
 
 if __name__ == "__main__":
     main()
+    initialise_database()
+    print("EDR database initialised successfully.")
