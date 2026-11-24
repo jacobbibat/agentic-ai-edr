@@ -8,7 +8,7 @@ async function loadEvents() {
         if(!response.ok) {
             throw new Error("Failed to retrieve events");
         }
-        storedEvent = await response.json();
+        storedEvents = await response.json();
 
         displayEvents(storedEvents);
 

@@ -88,3 +88,22 @@ def test_dashboard_stats_empty(client):
     assert data["high_severity"] == 0
     assert data["medium_severity"] == 0
     assert data["low_severity"] == 0
+
+
+def test_events_page(client):
+    """Verify the Events HTML page loads."""
+
+    response = client.get("/events")
+
+    assert response.status_code == 200
+    assert b"Endpoint Events" in response.data
+
+
+def test_events_api_empty(client):
+    """Verify an empty test database returns an empty list."""
+
+    response = client.get("/api/events")
+
+    assert response.status_code == 200
+    assert response.get_json() == []
+

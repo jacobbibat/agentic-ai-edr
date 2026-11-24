@@ -138,9 +138,10 @@ class SecurityRepository:
                 return None
 
             event = dict(row)  # converts SQLite row into Python dictionary
-            event["event_data"] = json.loads(
-                event["event_data"]
-            )  # cconverts JSON text back into Python dictionary
+            event["event_data"] = json.loads(event["event_data"])
+
+            return event
+
 
     def get_all_events(self) -> list[dict]:
         """Retrieve all stored endpoint events."""
@@ -170,6 +171,7 @@ class SecurityRepository:
             events.append(event)
 
         return events
+
 
     def get_dashboard_stats(self) -> dict:
         """Return statistics for security dashboard"""
