@@ -52,7 +52,7 @@ def create_app(database_path=DATABASE_PATH):
     def events_page():
         """Display endpoint events page"""
         return render_template("events.html")
-    
+
     return app
 
 

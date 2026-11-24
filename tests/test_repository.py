@@ -140,8 +140,9 @@ def test_retrieve_event_and_alerts(test_repository):
     assert saved_event["event_data"]["EventID"] == 1
     assert saved_event["endpoint"] == "WIN11-ENDPOINT"
 
+
 def test_get_all_events(tmp_path):
-    #Create isolated test environment
+    # Create isolated test environment
     database_path = tmp_path / "test_edr.db"
 
     initialise_database(database_path)
@@ -157,7 +158,7 @@ def test_get_all_events(tmp_path):
         "CommandLine": "notepad.exe",
     }
 
-    # Save an event with no alerts 
+    # Save an event with no alerts
     repository.save_event_with_alerts(event, [])
 
     # Retrieve events

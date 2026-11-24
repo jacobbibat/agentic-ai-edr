@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}
+Endpoint Events | Agentic AI EDR
+{% endblock %}
+
+{% block content %}
+
+<h1 class="title">Endpoint Events</h1>
+
+<p class="subtitle">
+    View and inspect stored Sysmon events.
+</p>
+
+<div class="box">
+    <div class="table-container">
+        <table class="table is-fullwidth is-striped is-hoverable">
+
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Endpoint</th>
+                    <th>Event ID</th>
+                    <th>Process</th>
+                    <th>Parent Process</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="events-table-body">
+                <tr>
+                    <td colspan="6">
+                        Loading endpoint events...
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+<!-- Event details popup -->
+<div class="modal" id="event-details-modal">
+
+    <div class="modal-background"></div>
+
+    <div class="modal-card">
+
+        <header class="modal-card-head">
+            <p class="modal-card-title">
+                Event Details
+            </p>
+
+            <button class="delete"
+                    id="close-modal"
+                    aria-label="Close">
+            </button>
+        </header>
+
+        <section class="modal-card-body">
+            <h2 class="title is-6">Original Sysmon Event</h2>
+
+            <pre id="event-json"></pre>
+        </section>
+
+    </div>
+</div>
+
+<script
+    src="{{ url_for('static', filename='js/events.js') }}"
+    defer>
+</script>
+
+{% endblock %}

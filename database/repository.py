@@ -171,7 +171,6 @@ class SecurityRepository:
 
         return events
 
-
     def get_dashboard_stats(self) -> dict:
         """Return statistics for security dashboard"""
 
