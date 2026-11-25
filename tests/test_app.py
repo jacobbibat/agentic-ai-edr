@@ -106,4 +106,3 @@ def test_events_api_empty(client):
 
     assert response.status_code == 200
     assert response.get_json() == []
-

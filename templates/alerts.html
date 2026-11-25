@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}
+Security Alerts | Agentic AI EDR
+{% endblock %}
+
+{% block content %}
+
+<h1 class="title">Security Alerts</h1>
+
+<p class="subtitle">
+    View and investigate detected security threats.
+</p>
+
+<!-- Container for alerts table -->
+<div class="box">
+    <div class="table-container">
+        <table class="table is-fullwidth is-striped is-hoverable">
+
+            <thead>
+                <tr>
+                    <th>Alert ID</th>
+                    <th>Timestamp</th>
+                    <th>Endpoint</th>
+                    <th>Detection Rules</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <!-- JS to populate this table -->
+            <tbody id="alerts-table-body">
+                <tr>
+                    <td colspan="7">
+                        Loading security alerts ...
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+<!-- Alert details popup -->
+<div class="modal" id="alert-detail-modal">
+
+    <!-- Background overlay -->
+    <div class="modal-background"></div>
+
+    <!-- Popup container -->
+    <div class="modal-card">
+
+        <header class="modal-card-head">
+            <p class="modal-card-title">
+                Alert details
+            </p>
+
+            <button class="delete"
+                    id="close-modal"
+                    aria-label="Close">
+            </button>
+        </header>
+
+        <section class="modal-card-body">
+
+            <h2 class="title is-6">Detection Evidence</h2>
+
+            <pre id="alert-evidence"></pre>
+
+        </section>
+
+    </div> <!-- Close modal-card -->
+
+</div>
+
+<!-- Load JS for this page -->
+<script
+    src="{{ url_for('static', filename='js/alerts.js') }}"
+    defer>
+</script>
+
+{% endblock %}

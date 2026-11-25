@@ -33,6 +33,7 @@
             <ul class="menu-list">
                 <li><a href="/">Dashboard</a></li>
                 <li><a href="/events">Events Timeline</a></li>
+                <li><a href="/alerts">Security Alerts</a></li>
                 <li><a href="/aiInvestigation">AI Investigations</a></li>
                 <li><a href="/mitre">MITRE ATT&CK</a></li>
                 <li><a href="/performance">Performance</a></li>
@@ -47,14 +48,11 @@
         </main>
 
     </div>
-    <script>
-    const currentPage = window.location.pathname;
 
-    document.querySelectorAll(".menu-list a").forEach(link => {
-        if (link.pathname === currentPage) {
-            link.classList.add("is-active");
-        }
-    });
-</script>
+    <script
+    src="{{ url_for('static', filename='js/utils.js') }}"
+    defer>
+    </script>
+    
 </body>
 </html>

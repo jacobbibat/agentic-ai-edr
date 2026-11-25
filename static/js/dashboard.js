@@ -1,17 +1,15 @@
 async function loadDashboard() {
     try {
-        // Step 1: Retrieve dashboard statistics.
+        // Retrieve dashboard statistics
         const statsResponse = await fetch("/api/dashboard/stats");
-        console.log("Loading dashboard statistics...");
 
         if (!statsResponse.ok) {
             throw new Error("Failed to load dashboard statistics");
         }
 
         const stats = await statsResponse.json();
-        console.log("Statistics received:", stats);
 
-        // Step 2: Update the summary cards.
+        // Update the summary cards
         document.getElementById("total-events").textContent =
             stats.total_events;
 
@@ -21,7 +19,7 @@ async function loadDashboard() {
         document.getElementById("high-severity").textContent =
             stats.high_severity;
 
-        // Step 3: Retrieve security alerts.
+        // Retrieve security alerts
         const alertsResponse = await fetch("/api/alerts");
 
         if (!alertsResponse.ok) {
@@ -32,10 +30,10 @@ async function loadDashboard() {
 
         const tableBody = document.getElementById("alerts-table-body");
 
-        // Clear the loading message.
+        // Clear existing table rows
         tableBody.replaceChildren();
 
-        // Step 4: Handle an empty database.
+        // Handle an empty database
         if (alerts.length === 0) {
             const row = tableBody.insertRow();
             const cell = row.insertCell();
@@ -45,34 +43,17 @@ async function loadDashboard() {
             return;
         }
 
-        // Step 5: Display the 10 most recent alerts.
+        // Display the 10 most recent alerts
         alerts.slice(0, 10).forEach(alert => {
             const row = tableBody.insertRow();
 
-            const ruleIdCell = row.insertCell();
-            ruleIdCell.textContent = alert.rule_id;
+            row.insertCell().textContent = alert.rule_id;
+            row.insertCell().textContent = alert.rule_name;
 
-            const ruleNameCell = row.insertCell();
-            ruleNameCell.textContent = alert.rule_name;
+            // Use the shared severity function from utils.js
+            row.insertCell().appendChild(createSeverityTag(alert.severity));
 
-            const severityCell = row.insertCell();
-            const severityTag = document.createElement("span");
-
-            severityTag.classList.add("tag");
-
-            if (alert.severity === "High") {
-                severityTag.classList.add("is-danger");
-            } else if (alert.severity === "Medium") {
-                severityTag.classList.add("is-warning");
-            } else {
-                severityTag.classList.add("is-info");
-            }
-
-            severityTag.textContent = alert.severity;
-            severityCell.appendChild(severityTag);
-
-            const statusCell = row.insertCell();
-            statusCell.textContent = alert.status;
+            row.insertCell().textContent = alert.status;
         });
 
     } catch (error) {
@@ -89,5 +70,5 @@ async function loadDashboard() {
     }
 }
 
-// Load dashboard information when the page opens.
+// Load dashboard information when the page opens
 document.addEventListener("DOMContentLoaded", loadDashboard);

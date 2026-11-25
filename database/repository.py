@@ -142,7 +142,6 @@ class SecurityRepository:
 
             return event
 
-
     def get_all_events(self) -> list[dict]:
         """Retrieve all stored endpoint events."""
 
@@ -171,7 +170,6 @@ class SecurityRepository:
             events.append(event)
 
         return events
-
 
     def get_dashboard_stats(self) -> dict:
         """Return statistics for security dashboard"""

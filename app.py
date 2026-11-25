@@ -53,6 +53,17 @@ def create_app(database_path=DATABASE_PATH):
         """Display endpoint events page"""
         return render_template("events.html")
 
+    # Display security alerts page
+    @app.get("/alerts")
+    def alerts_page():
+        return render_template("alerts.html")
+
+    # API
+    @app.get("/api/alerts")
+    def api_alerts():
+        alerts = repository.get_all_alerts()
+        return jsonify(alerts)
+
     return app
 
 
