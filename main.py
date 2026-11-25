@@ -1,4 +1,4 @@
-from collector.read_events import load_events
+from collector.read_events import load_live_events
 from database.connection import initialise_database
 from database.repository import SecurityRepository
 from detection.engine import DetectionEngine
@@ -6,30 +6,26 @@ from detection.registry import DETECTION_RULES
 
 
 def main():
-    # Step 1: Initialise database tables.
-    initialise_database()
+    # Retrieve real Symon events
+    events = load_live_events(10)
 
-    # Step 2: Load sample Sysmon events.
-    events = load_events()
-
-    # Step 3: Set up the detection engine and repository.
+    # Set up detection engine
     engine = DetectionEngine(DETECTION_RULES)
-    repository = SecurityRepository()
 
-    print(f"Loaded {len(events)} Sysmon events.")
+    print(f"Loaded {len(events)} real Sysmon events.")
 
-    # Step 4: Process every event.
+    # Process every event
     for event in events:
         alerts = engine.analyse(event)
 
-        # Step 5: Save the event and any matching alerts.
-        event_id = repository.save_event_with_alerts(
-            event,
-            alerts,
-        )
+        print(f"Event Record ID: {event['EventRecordID']}")
+        print(f"Process: {event['Image']}")
+        print(f"Parent: {event['ParentImage']}")
+        print(f"Alerts generated: {len(alerts)}")
+        print("-" * 80)
 
-        print(f"Stored event {event_id} with {len(alerts)} alerts.")
-
+        for alert in alerts:
+            print(alerts)
 
 if __name__ == "__main__":
     main()
