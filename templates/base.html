@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width", initial-scale="1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>
         {% block title %}Agentic AI EDR{% endblock %}
@@ -11,24 +11,50 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bulma.min.css')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css')}}">
-
 </head>
 
 <body>
-    <nav class="navbar is-dark">
-        <div class="navbar-brand">
-            <a class="navbar-item" href="/">
-                <strong>Agentic AI EDR</strong>
-            </a>
-        </div>
-    </nav>
 
-    <main class="section">
-        <div class="container is-fluid">
+    <!-- Contains the sidebar and main content -->
+    <div class="app-layout">
+
+        <!-- Left navigation sidebar -->
+        <aside class="sidebar menu">
+
+            <!-- Application name -->
+            <h1 class="title is-5">
+                Agentic AI EDR
+            </h1>
+
+            <!-- Navigation heading -->
+            <p class="menu-label">Welcome User</p>
+
+            <!-- Navigation links -->
+            <ul class="menu-list">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/events">Events Timeline</a></li>
+                <li><a href="/aiInvestigation">AI Investigations</a></li>
+                <li><a href="/mitre">MITRE ATT&CK</a></li>
+                <li><a href="/performance">Performance</a></li>
+                <li><a href="/settings">Settings</a></li>
+            </ul>
+
+        </aside>
+
+        <!-- Main page content -->
+        <main class="main-content">
             {% block content %}{% endblock %}
-        </div>
-    </main>
+        </main>
 
+    </div>
+    <script>
+    const currentPage = window.location.pathname;
+
+    document.querySelectorAll(".menu-list a").forEach(link => {
+        if (link.pathname === currentPage) {
+            link.classList.add("is-active");
+        }
+    });
+</script>
 </body>
 </html>
-

@@ -1,0 +1,39 @@
+/* Main application layout */
+.app-layout {
+    display: flex;          /* Places sidebar and content side by side */
+    height: 100vh;          /* Uses the full height of the browser */
+    overflow: hidden;      /* Prevents the entire page from scrolling */
+}
+
+/* Left navigation sidebar */
+.sidebar {
+    width: 250px;                 /* Sets the sidebar width */
+    flex-shrink: 0;               /* Prevents the sidebar from shrinking */
+    background-color: #191e26;    /* Dark sidebar background */
+    padding: 20px;                /* Space inside the sidebar */
+    border-right: 1px solid #343c48;
+    overflow-y: auto;             /* Scroll sidebar only if necessary */
+}
+
+/* Main page content */
+.main-content {
+    flex: 1;                /* Occupies the remaining available width */
+    min-width: 0;           /* Prevents wide tables expanding the layout */
+    padding: 24px;          /* Space around the page content */
+    overflow: auto;         /* Scroll content only when necessary */
+}
+
+/* Navigation links */
+.sidebar .menu-list a {
+    padding: 12px;          /* Space inside each link */
+    margin-bottom: 5px;     /* Space between links */
+    border-radius: 5px;     /* Rounded corners */
+}
+
+/* When hovering over a navigation link */
+.menu-list a.is-active {
+    background-color: #710c04;
+    transition: background-color 0.2s ease;
+    color: #cdf0ea;
+    font-weight: 600;
+}
