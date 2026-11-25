@@ -9,6 +9,8 @@ async function loadEvents() {
             throw new Error("Failed to retrieve events");
         }
         storedEvents = await response.json();
+        console.log(storedEvents);
+
 
         displayEvents(storedEvents);
 
@@ -23,7 +25,7 @@ async function loadEvents() {
         const cell = row.insertCell();
 
         cell.colSpan = 6;
-        cell.textContext = "Unable to load endpoint activities";
+        cell.textContent = "Unable to load endpoint activities";
     }
 }
 
@@ -40,14 +42,14 @@ function displayEvents(events) {
         const cell = row.insertCell();
 
         cell.colSpan = 6;
-        cell.textContext = "No events found";
+        cell.textContent = "No events found";
         return;
     }
 
     events.forEach(event => {
         const row = tableBody.insertRow();
 
-        const data = event.events_data;
+        const data = event.event_data;
 
         // Extract file names from Windows Paths
         const processName = (path) => {
@@ -55,12 +57,12 @@ function displayEvents(events) {
             return path.split("\\").pop();
         };
 
-        row.insertCell().textContext = event.timestamp;
-        row.insertCell().textContext = event.endpoint;
-        row.insertCell().textContext = event.sysmon_event_id;
+        row.insertCell().textContent = event.timestamp;
+        row.insertCell().textContent = event.endpoint;
+        row.insertCell().textContent = event.sysmon_event_id;
 
-        row.insertCell().textContext = processName(data.Image);
-        row.insertCell().textContext = processName(data.ParentImage);
+        row.insertCell().textContent = processName(data.Image);
+        row.insertCell().textContent = processName(data.ParentImage);
 
         const actionCell = row.insertCell();
 
@@ -80,7 +82,7 @@ function displayEvents(events) {
 // Open the modal showing the original event
 function showEventDetails(event) {
     const modal = document.getElementById(
-        "events-detail-modal"
+        "event-detail-modal"
     );
 
     const jsonDisplay = document.getElementById(
@@ -88,7 +90,7 @@ function showEventDetails(event) {
     );
 
     jsonDisplay.textContent = JSON.stringify(
-        event.events_data,
+        event.event_data,
         null,
         4
     );
@@ -99,8 +101,8 @@ function showEventDetails(event) {
 //Close the modal
 function closeEventDetails() {
     document.getElementById(
-        "event-details-modal"
-    ).classList.remove(is-active);
+        "event-detail-modal"
+    ).classList.remove("is-active");
 }
 
 // Initialise the page
