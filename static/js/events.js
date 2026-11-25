@@ -58,7 +58,6 @@ function displayEvents(events) {
         };
 
         row.insertCell().textContent = event.timestamp;
-        row.insertCell().textContent = event.endpoint;
         row.insertCell().textContent = event.sysmon_event_id;
 
         row.insertCell().textContent = processName(data.Image);

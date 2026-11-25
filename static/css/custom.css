@@ -37,3 +37,59 @@
     color: #cdf0ea;
     font-weight: 600;
 }
+
+/* Modal for alerts page */
+/* Position the alert modal on the right */
+/* Security Alerts page layout */
+.alerts-layout {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Main alert content */
+.alerts-main {
+    flex: 1;
+    min-width: 0;
+    overflow: auto;
+    transition: flex 0.3s ease;
+}
+
+/* Right-hand alert panel */
+.alert-push-panel {
+    display: flex;
+    position: relative;
+    inset: auto;
+
+    flex: 0 0 0;
+    min-width: 0;
+    height: 100%;
+
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: flex-basis 0.3s ease;
+}
+
+/* Open the panel and reduce the main content width */
+.alert-push-panel.is-active {
+    display: flex;
+    flex-basis: min(420px, 45%);
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Reuse the Bulma modal card */
+.alert-push-panel .alert-side-modal {
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+
+    border-left: 1px solid #334155;
+}

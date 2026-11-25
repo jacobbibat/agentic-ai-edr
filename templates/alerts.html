@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block title %}
@@ -6,71 +7,120 @@ Security Alerts | Agentic AI EDR
 
 {% block content %}
 
-<h1 class="title">Security Alerts</h1>
+<div class="alerts-layout" id="alerts-layout">
 
-<p class="subtitle">
-    View and investigate detected security threats.
-</p>
+    <div class="alerts-main">
 
-<!-- Container for alerts table -->
-<div class="box">
-    <div class="table-container">
-        <table class="table is-fullwidth is-striped is-hoverable">
+        <h1 class="title">Security Alerts</h1>
 
-            <thead>
-                <tr>
-                    <th>Alert ID</th>
-                    <th>Timestamp</th>
-                    <th>Endpoint</th>
-                    <th>Detection Rules</th>
-                    <th>Severity</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+        <p class="subtitle">
+            View and investigate detected security threats.
+        </p>
 
-            <!-- JS to populate this table -->
-            <tbody id="alerts-table-body">
-                <tr>
-                    <td colspan="7">
-                        Loading security alerts ...
-                    </td>
-                </tr>
-            </tbody>
+        <!-- Container for alerts table -->
+        <div class="box">
+            <div class="table-container">
+                <table class="table is-fullwidth is-striped is-hoverable">
 
-        </table>
+                    <thead>
+                        <tr>
+                            <th>Alert ID</th>
+                            <th>Detection Rules</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Classification</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+
+                    <!-- JS to populate this table -->
+                    <tbody id="alerts-table-body">
+                        <tr>
+                            <td colspan="6">
+                                Loading security alerts ...
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
     </div>
-</div>
 
-<!-- Alert details popup -->
-<div class="modal" id="alert-detail-modal">
+    <!-- Alert details popup -->
+    <div class="modal alert-push-panel" id="alert-detail-modal">
 
-    <!-- Background overlay -->
-    <div class="modal-background"></div>
+        <!-- Background overlay -->
 
-    <!-- Popup container -->
-    <div class="modal-card">
+        <!-- Popup container -->
+        <div class="modal-card alert-side-modal">
 
-        <header class="modal-card-head">
-            <p class="modal-card-title">
-                Alert details
-            </p>
+            <header class="modal-card-head">
+                <div>
+                    <p class="title is-5" id="detail-alert-id">
+                        Alert Details
+                    </p>
+                    <p class="is-size-7" id="detail-description">
+                        Security alert information
+                    </p>
+                </div>
 
-            <button class="delete"
-                    id="close-modal"
-                    aria-label="Close">
-            </button>
-        </header>
+                <div class="is-flex is-align-items-center">
+                    <div id="detail-severity" class="mr-4"></div>
+                    
+                    <button class="delete"
+                            id="close-modal"
+                            aria-label="Close alert details">
+                    </button>
+                </div>
+            </header>
 
-        <section class="modal-card-body">
+            <!-- tabs -->
+            <div class="tabs is-small mb-0">
+                <ul>
+                    <li class="is-active" data-tab="overview">
+                        <a href="#" data-tab-link>Overview</a>
+                    </li>
 
-            <h2 class="title is-6">Detection Evidence</h2>
+                    <li data-tab="proof">
+                        <a href="#" data-tab-link>Proof</a>
+                    </li>
 
-            <pre id="alert-evidence"></pre>
+                    <li data-tab="ai">
+                        <a href="#" data-tab-link>AI Investigation</a>
+                    </li>
+                </ul>
+            </div>
 
-        </section>
+             <!-- Tab Content-->
+              <section class="modal-card-body">
 
-    </div> <!-- Close modal-card -->
+                <div id="tab-overview">
+                </div>
+
+                <div id="tab-proof" class="is-hidden">
+                </div>
+
+                <div id="tab-ai" class="is-hidden">
+                </div>
+
+              </section>
+
+            <!-- Footer -->
+            <footer class="modal-card-foot is-justify-content-flex-end">
+                <button class="button is-info" disabled>
+                    AI Investigation
+                </button>
+
+                <button class="button" id="close-modal-footer">
+                    Close
+                </button>
+            </footer>
+            
+        </div> <!-- Close modal-card -->
+
+    </div>
 
 </div>
 
