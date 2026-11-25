@@ -6,11 +6,15 @@ from detection.registry import DETECTION_RULES
 
 
 def main():
-    # Retrieve real Symon events
-    events = load_live_events(10)
+    #Initialise database
+    initialise_database()
 
-    # Set up detection engine
+    # Retrieve real Symon events
+    events = load_live_events(2)
+
+    # Set up detection engine and repository
     engine = DetectionEngine(DETECTION_RULES)
+    repository = SecurityRepository()
 
     print(f"Loaded {len(events)} real Sysmon events.")
 
@@ -18,14 +22,19 @@ def main():
     for event in events:
         alerts = engine.analyse(event)
 
+        #Store events with associated alert
+        event_id = repository.save_event_with_alerts(event, alerts)
+
         print(f"Event Record ID: {event['EventRecordID']}")
         print(f"Process: {event['Image']}")
         print(f"Parent: {event['ParentImage']}")
         print(f"Alerts generated: {len(alerts)}")
-        print("-" * 80)
+        print(f"Stored database event ID: {event_id}") # Display ID assigned by SQLite
 
         for alert in alerts:
             print(alerts)
+
+        print("-" * 80)
 
 if __name__ == "__main__":
     main()

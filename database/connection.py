@@ -23,7 +23,7 @@ def get_connection(
     connection.row_factory = sqlite3.Row
 
     # Enforce relationships between tables, basically SQLite rejects inserting in SQL, makes sure both keys reference each other
-    connection.execute("PRAGMA foreign_kets = ON")
+    connection.execute("PRAGMA foreign_keys = ON")
 
     return connection
 
