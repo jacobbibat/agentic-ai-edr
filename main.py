@@ -18,21 +18,27 @@ def main():
 
     print(f"Loaded {len(events)} real Sysmon events.")
 
-    # Process every event
     for event in events:
+
+        # Check whether this event has already been processed.
+        if repository.event_exists(event):
+            print(f"Skipping duplicate event: {event['EventRecordID']}")
+            continue
+
+        # Analyse the event using detection rules.
         alerts = engine.analyse(event)
 
-        #Store events with associated alert
+        # Store the event and its associated alerts.
         event_id = repository.save_event_with_alerts(event, alerts)
 
         print(f"Event Record ID: {event['EventRecordID']}")
         print(f"Process: {event['Image']}")
         print(f"Parent: {event['ParentImage']}")
         print(f"Alerts generated: {len(alerts)}")
-        print(f"Stored database event ID: {event_id}") # Display ID assigned by SQLite
+        print(f"Stored database event ID: {event_id}")
 
         for alert in alerts:
-            print(alerts)
+            print(alert)
 
         print("-" * 80)
 

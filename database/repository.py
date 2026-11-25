@@ -209,3 +209,35 @@ class SecurityRepository:
             "medium_severity": severity_counts["Medium"],
             "low_severity": severity_counts["Low"],
         }
+
+    def event_exists(self, event: dict) -> bool:
+        """Checks whether a real Sysmon event is already stored"""
+
+        record_id = event.get("EventRecordID")
+        channel = event.get("System", {}).get("Channel")
+
+        if record_id is None or channel is None:
+            return False
+
+        with closing(get_connection(self.database_path)) as connection:
+            row = connection.execute(
+                """
+                SELECT 1
+                FROM security_events
+                WHERE endpoint = ?
+                AND json_extract(event_data, '$.System.Channel') = ?
+                AND json_extract(event_data, '$.EventRecordID') = ?
+                AND timestamp = ?
+                LIMIT 1
+                """,
+                (
+                    event["Computer"],
+                    channel,
+                    record_id,
+                    event["UtcTime"],
+                ),
+            ).fetchone()
+
+        return row is not None
+
+

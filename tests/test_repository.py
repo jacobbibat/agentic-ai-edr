@@ -169,3 +169,74 @@ def test_get_all_events(tmp_path):
     assert events[0]["sysmon_event_id"] == 1
     assert events[0]["endpoint"] == "WIN-01"
     assert events[0]["event_data"]["Image"] == event["Image"]
+
+@pytest.fixture
+def live_event():
+    """Provide a synthetic real Sysmon event."""
+
+    return {
+        "EventID": 1,
+        "EventRecordID": 3066,
+        "UtcTime": "2026-11-25 21:36:25.475",
+        "Computer": "WIN11-ENDPOINT",
+        "Image": r"C:\Windows\System32\notepad.exe",
+        "ParentImage": r"C:\Windows\explorer.exe",
+        "CommandLine": "notepad.exe",
+        "System": {
+            "Channel": "Microsoft-Windows-Sysmon/Operational",
+        },
+    }
+
+
+def test_event_does_not_exist(test_repository, live_event):
+    assert test_repository.event_exists(live_event) is False
+
+
+def test_event_already_exists(test_repository, live_event):
+    test_repository.save_event_with_alerts(live_event, [])
+
+    assert test_repository.event_exists(live_event) is True
+
+
+def test_prevent_duplicate_event(test_repository, live_event):
+    test_repository.save_event_with_alerts(live_event, [])
+
+    with pytest.raises(sqlite3.IntegrityError):
+        test_repository.save_event_with_alerts(live_event, [])
+
+    assert len(test_repository.get_all_events()) == 1
+
+
+def test_same_record_different_endpoint(test_repository, live_event):
+    test_repository.save_event_with_alerts(live_event, [])
+
+    second_event = live_event.copy()
+    second_event["Computer"] = "WIN11-ENDPOINT-02"
+
+    assert test_repository.event_exists(second_event) is False
+
+    test_repository.save_event_with_alerts(second_event, [])
+
+    assert len(test_repository.get_all_events()) == 2
+
+
+def test_same_record_different_timestamp(test_repository, live_event):
+    test_repository.save_event_with_alerts(live_event, [])
+
+    second_event = live_event.copy()
+    second_event["UtcTime"] = "2026-11-25 22:40:12.000"
+
+    assert test_repository.event_exists(second_event) is False
+
+    test_repository.save_event_with_alerts(second_event, [])
+
+    assert len(test_repository.get_all_events()) == 2
+
+
+def test_sample_event_without_record_id(test_repository, live_event):
+    sample_event = live_event.copy()
+    del sample_event["EventRecordID"]
+
+    test_repository.save_event_with_alerts(sample_event, [])
+
+    assert test_repository.event_exists(sample_event) is False

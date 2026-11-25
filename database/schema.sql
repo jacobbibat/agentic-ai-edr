@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS security_events (
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-
 CREATE TABLE IF NOT EXISTS security_alerts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     event_id INTEGER NOT NULL,
@@ -21,3 +20,13 @@ CREATE TABLE IF NOT EXISTS security_alerts (
     FOREIGN KEY (event_id)
         REFERENCES security_events(id)
 );
+
+-- Prevent duplicate real Sysmon events.
+CREATE UNIQUE INDEX IF NOT EXISTS unique_sysmon_event
+ON security_events (
+    endpoint,
+    json_extract(event_data, '$.System.Channel'),
+    json_extract(event_data, '$.EventRecordID'),
+    timestamp
+)
+WHERE json_extract(event_data, '$.EventRecordID') IS NOT NULL;
