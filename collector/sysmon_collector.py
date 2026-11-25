@@ -1,4 +1,8 @@
 import win32evtlog
+import json
+import win32evtlog
+
+from collector.sysmon_parser import SysmonParser
 
 
 class SysmonCollector:
@@ -39,9 +43,14 @@ class SysmonCollector:
 
 if __name__ == "__main__":
     collector = SysmonCollector()
+    parser = SysmonParser()
 
-    events = collector.get_events(5)
+    events = collector.get_events(1)
 
-    for event in events:
-        print(event)
-        print("-" * 80)
+    for event_xml in events:
+
+        #Convert XML into a structured library
+        parsed_event = parser.parse_event(event_xml)
+
+        # Display the complete parsed event
+        print(json.dumps(parsed_event, indent=4))
