@@ -240,3 +240,58 @@ def test_sample_event_without_record_id(test_repository, live_event):
     test_repository.save_event_with_alerts(sample_event, [])
 
     assert test_repository.event_exists(sample_event) is False
+
+
+def test_get_missing_checkpoint(test_repository):
+    checkpoint = test_repository.get_checkpoint(
+        "WIN-01",
+        "Sysmon",
+    )
+
+    assert checkpoint == 0
+
+
+def test_save_checkpoint(test_repository):
+    test_repository.save_checkpoint(
+        "WIN-01",
+        "Sysmon",
+        3066,
+    )
+
+    checkpoint = test_repository.get_checkpoint(
+        "WIN-01",
+        "Sysmon",
+    )
+
+    assert checkpoint == 3066
+
+
+def test_update_checkpoint(test_repository):
+    test_repository.save_checkpoint("WIN-01", "Sysmon", 3066)
+    test_repository.save_checkpoint("WIN-01", "Sysmon", 3076)
+
+    checkpoint = test_repository.get_checkpoint(
+        "WIN-01",
+        "Sysmon",
+    )
+
+    assert checkpoint == 3076
+
+
+def test_separate_endpoint_checkpoints(test_repository):
+    test_repository.save_checkpoint("WIN-01", "Sysmon", 3066)
+    test_repository.save_checkpoint("WIN-02", "Sysmon", 1500)
+
+    assert test_repository.get_checkpoint("WIN-01", "Sysmon") == 3066
+    assert test_repository.get_checkpoint("WIN-02", "Sysmon") == 1500
+
+
+def test_checkpoint_persists(test_repository):
+    test_repository.save_checkpoint("WIN-01", "Sysmon", 3066)
+
+    # Create a new repository using the same database.
+    repository = SecurityRepository(
+        test_repository.database_path
+    )
+
+    assert repository.get_checkpoint("WIN-01", "Sysmon") == 3066

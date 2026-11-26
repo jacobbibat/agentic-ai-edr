@@ -240,4 +240,48 @@ class SecurityRepository:
 
         return row is not None
 
+    # Checkpoint methods
+    def get_checkpoint(self, endpoint: str, channel: str) -> int:
+        """Retrieve the last processed event record ID."""
+
+        with closing(get_connection(self.database_path)) as connection:
+            row = connection.execute(
+                """
+                SELECT last_record_id
+                FROM collection_checkpoints
+                WHERE endpoint = ?
+                AND channel = ?
+                """,
+                (endpoint, channel),
+            ).fetchone()
+
+        # No checkpoint exists yet
+        if row is None:
+            return 0 #Endpoint starts retrieving from oldest available events
+
+        return row["last_record_id"]
+
+    def save_checkpoint(self, endpoint: str, channel: str, last_record_id: int,) -> None:
+        """Save the collection progress for an endpoint"""
+
+        with closing(get_connection(self.database_path)) as connection:
+            connection.execute(
+                """
+                INSERT INTO collection_checkpoints (
+                    endpoint,
+                    channel,
+                    last_record_id  
+                )
+                VALUES(?, ?, ?)
+
+                ON CONFLICT(endpoint, channel)
+                DO UPDATE SET
+                    last_record_id = excluded.last_record_id,
+                    updated_at = CURRENT_TIMESTAMP
+                """,
+                (endpoint, channel, last_record_id)
+            )
+
+            connection.commit()
+
 

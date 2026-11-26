@@ -30,3 +30,13 @@ ON security_events (
     timestamp
 )
 WHERE json_extract(event_data, '$.EventRecordID') IS NOT NULL;
+
+-- Store collection progress for each endpoint and channel.
+CREATE TABLE IF NOT EXISTS collection_checkpoints (
+    endpoint TEXT NOT NULL,
+    channel TEXT NOT NULL,
+    last_record_id INTEGER NOT NULL DEFAULT 0,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY(endpoint, channel)
+)

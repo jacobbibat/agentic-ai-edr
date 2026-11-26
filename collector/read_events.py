@@ -32,6 +32,28 @@ def load_live_events(limit: int = 10) -> list[dict]:
 
     return events
 
+def load_new_events(last_record_id: int, limit: int = 100,) -> list[dict]:
+    """Retrieve and parse new Sysmon events"""
+
+    from collector.sysmon_collector import SysmonCollector
+
+    collector = SysmonCollector()
+    parser = SysmonParser()
+
+    #Retrieve events after the last processed record.
+    raw_events = collector.get_new_events(
+        last_record_id,
+        limit,
+    )
+
+    events = []
+
+    #Convert XML event into a dictionary
+    for raw_event in raw_events:
+        event = parser.parse_event(raw_event)
+        events.append(event)
+
+    return events
 
 if __name__ == "__main__":
     events = load_events()
