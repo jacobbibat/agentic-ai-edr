@@ -1,5 +1,4 @@
 import win32evtlog
-import json
 
 from collector.sysmon_parser import SysmonParser
 
@@ -10,57 +9,31 @@ class SysmonCollector:
     def __init__(self):
         self.channel = "Microsoft-Windows-Sysmon/Operational"
 
-    def get_events(self, limit: int = 10) -> list[str]:
-        """Retrieve the most recent Sysmon process creation events."""
+    def _query_events(
+        self,
+        query: str,
+        direction: int,
+        limit: int,
+    ) -> list[str]:
+        """Execute a Sysmon query and return raw XML events."""
 
-        # Query Sysmon for Event ID 1 (process creation)
-        query = "*[System[EventID=1]]"
-
-        # Retrieve events starting with the newest
+        # Create a Windows query handle.
         handle = win32evtlog.EvtQuery(
             self.channel,
-            win32evtlog.EvtQueryChannelPath | win32evtlog.EvtQueryReverseDirection, 
+            win32evtlog.EvtQueryChannelPath | direction,
             query,
         )
 
         events = []
-
-        # Retrieve the requested number of events
-        event_handles = win32evtlog.EvtNext(handle, limit)
-
-        for event_handle in event_handles:
-            # Convert the Windows event into XML
-            event_xml = win32evtlog.EvtRender(
-                event_handle,
-                win32evtlog.EvtRenderEventXml,
-            )
-
-            events.append(event_xml)
-
-        return events
-
-    def get_new_events(self, last_record_id: int, limit: int=100,) -> list[str]:
-        """Retrieve Sysmon events after last processed record ID"""
-        query =(
-            f"*[System[EventID=1 and "
-            f"EventRecordID > {last_record_id}]]"
-        )
-
-        # Retrieve events from oldest to newest
-        handle = win32evtlog.EvtQuery(
-            self.channel,
-            win32evtlog.EvtQueryChannelPath | win32evtlog.EvtQueryForwardDirection,
-            query,
-        )
-
-        events =[]
+        event_handles = []
 
         try:
-            #Retrieve batch of new events
+            # Retrieve a batch of event handles.
             event_handles = win32evtlog.EvtNext(handle, limit)
 
             for event_handle in event_handles:
-                #Convert event into raw XML
+
+                # Convert each Windows event into XML.
                 event_xml = win32evtlog.EvtRender(
                     event_handle,
                     win32evtlog.EvtRenderEventXml,
@@ -69,10 +42,43 @@ class SysmonCollector:
                 events.append(event_xml)
 
         finally:
-            # Release Windows query handle (for resources)
+            # Release all individual event handles.
+            for event_handle in event_handles:
+                event_handle.Close()
+
+            # Release the Windows query handle.
             handle.Close()
 
         return events
+
+    def get_events(self, limit: int = 10) -> list[str]:
+        """Retrieve the most recent Sysmon process creation events."""
+
+        query = "*[System[EventID=1]]"
+
+        return self._query_events(
+            query,
+            win32evtlog.EvtQueryReverseDirection,
+            limit,
+        )
+
+    def get_new_events(
+        self,
+        last_record_id: int,
+        limit: int = 100,
+    ) -> list[str]:
+        """Retrieve Sysmon events after the last processed record ID."""
+
+        query = (
+            f"*[System[EventID=1 and "
+            f"EventRecordID > {last_record_id}]]"
+        )
+
+        return self._query_events(
+            query,
+            win32evtlog.EvtQueryForwardDirection,
+            limit,
+        )
 
 
 if __name__ == "__main__":
